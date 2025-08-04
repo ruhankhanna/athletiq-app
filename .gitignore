@@ -1,0 +1,11 @@
+# Secrets
+.env
+.env.*
+
+# Python junk
+__pycache__/
+*.pyc
+
+# Dev artifacts
+tempcoderunnerfile.py
+venv/

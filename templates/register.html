@@ -1,0 +1,195 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="static/css/register.css">
+    <link rel="icon" type="image/png" href="static/images/favicon.png" />
+    <script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
+</head>
+
+
+<body>
+    <nav>
+        <img class="logo" src="static/images/AthletIQ (1).png" alt="NetrIQ Logo">
+        <div class="menu-button-container">
+            <div class="menu-button">
+                <i class="fa-solid fa-bars" style="color: #ffffff;" alt="menu-button"></i>
+            </div>
+            <div class="menu-content">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/rankings">Rankings</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/login">Log in</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="profile-button-container">
+            <div class="profile-button">
+                <i class="fa-solid fa-user" alt="profile-button" style="color: #ffffff;"></i>
+            </div>
+        </div>
+    </nav>
+    <div class="landing-container">
+        <div class="form-container">
+            <form class="register-form" method="POST" action="/register">
+                {% if error %}
+                    <p class="error">{{ error }}</p>
+                {% endif %}
+
+                <h2>Create Account</h2>
+
+                <fieldset>
+                    <legend>Personal Information</legend>
+                    <input type="text" name="first_name" placeholder="First Name" required>
+                    <input type="text" name="last_name" placeholder="Last Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+
+                    <div class="password-container">
+                    <input type="password" name="password" placeholder="Password" id="password" required minlength="8">
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
+
+                    <select name="gender" required>
+                    <option value="" disabled selected>Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="N/A">N/A</option>
+                    </select>
+
+                    <input type="date" name="birthday" required>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Location</legend>
+                    <input type="text" name="city" placeholder="City (e.g. Austin)" required>
+
+                    <select name="state" id="state" required>
+                        <option value="" disabled selected>– Select State –</option>
+                        <option value="AL">AL</option>
+                        <option value="AK">AK</option>
+                        <option value="AZ">AZ</option>
+                        <option value="AR">AR</option>
+                        <option value="CA">CA</option>
+                        <option value="CO">CO</option>
+                        <option value="CT">CT</option>
+                        <option value="DC">DC</option>
+                        <option value="DE">DE</option>
+                        <option value="FL">FL</option>
+                        <option value="GA">GA</option>
+                        <option value="HI">HI</option>
+                        <option value="ID">ID</option>
+                        <option value="IL">IL</option>
+                        <option value="IN">IN</option>
+                        <option value="IA">IA</option>
+                        <option value="KS">KS</option>
+                        <option value="KY">KY</option>
+                        <option value="LA">LA</option>
+                        <option value="ME">ME</option>
+                        <option value="MD">MD</option>
+                        <option value="MA">MA</option>
+                        <option value="MI">MI</option>
+                        <option value="MN">MN</option>
+                        <option value="MS">MS</option>
+                        <option value="MO">MO</option>
+                        <option value="MT">MT</option>
+                        <option value="NE">NE</option>
+                        <option value="NV">NV</option>
+                        <option value="NH">NH</option>
+                        <option value="NJ">NJ</option>
+                        <option value="NM">NM</option>
+                        <option value="NY">NY</option>
+                        <option value="NC">NC</option>
+                        <option value="ND">ND</option>
+                        <option value="OH">OH</option>
+                        <option value="OK">OK</option>
+                        <option value="OR">OR</option>
+                        <option value="PA">PA</option>
+                        <option value="RI">RI</option>
+                        <option value="SC">SC</option>
+                        <option value="SD">SD</option>
+                        <option value="TN">TN</option>
+                        <option value="TX">TX</option>
+                        <option value="UT">UT</option>
+                        <option value="VT">VT</option>
+                        <option value="VA">VA</option>
+                        <option value="WA">WA</option>
+                        <option value="WV">WV</option>
+                        <option value="WI">WI</option>
+                        <option value="WY">WY</option>
+                    </select>
+                    </fieldset>
+
+
+
+                <fieldset>
+                    <legend>Affiliations</legend>
+                    <input type="text" id="school" name="school" placeholder="Current HS or college (blank if N/A)">
+                    <input type="text" id="club_team" name="club_team" placeholder="Current club team (blank if N/A)">
+                    <input type="number" id="grad_year" name="grad_year" placeholder="Graduation year (blank if N/A)" min="2020" max="2100">
+
+
+                </fieldset>
+
+                <fieldset>
+                    <legend>Additional</legend>
+
+                    <div class="full-width-field">
+                        <label for="profile_link">athletic.net Profile Link</label>
+                        <input
+                        type="url"
+                        id="profile_link"
+                        name="profile_link"
+                        placeholder="https://www.athletic.net/..."
+                        required
+                        pattern="https://(www\.)?athletic\.net/.+"
+                        title="Please enter a valid athletic.net profile link that starts with https://www.athletic.net/">
+                        <small class="form-hint">Must be a public athletic.net profile link</small>
+                    </div>
+                </fieldset>
+
+
+
+                <button type="submit">Register</button>
+
+                <div class="bottom-link">
+                    Already have an account? <a href="/login">Log in</a>
+                </div>
+            </form>
+
+
+
+
+        </div>
+    </div>
+    <script defer src="/static/js/register.js"></script>
+    <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+                <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                </div>
+            </div>
+    </footer>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader-content">
+            <img src="/static/images/runners.gif" alt="Loading..." class="runner-gif" />
+            <p>Creating your athletIQ account...</p>
+        </div>
+    </div>
+
+</body>
+</html>

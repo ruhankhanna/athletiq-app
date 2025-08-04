@@ -1,0 +1,311 @@
+/* ========== GLOBAL ========== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+
+:root {
+  --maroon: #800000;
+  --black: #000;
+  --white: #fff;
+  --gray-light: #444;
+  --font: 'Roboto', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(to bottom, var(--maroon), var(--black));
+  color: var(--white);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+/* ========== NAV ========== */
+nav.rankings-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+nav.rankings-nav .logo {
+  height: 40px;
+}
+
+nav.rankings-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav.rankings-nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+}
+nav.rankings-nav a:hover {
+  color: var(--gray-light);
+}
+
+/* ========== HEADER & FILTERS ========== */
+.rankings-header {
+  margin-top: 80px;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.rankings-header h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.filters select {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--white);
+  color: var(--white);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.filters select:focus {
+  outline: none;
+  border-color: var(--maroon);
+}
+
+/* ========== CARDS GRID ========== */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+.card .place {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--maroon);
+}
+
+.card .runner-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+  text-decoration: none;
+  color: var(--white);
+}
+
+.card .runner-name:hover {
+  text-decoration: underline;
+}
+
+.card .event,
+.card .rating {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+/* ========== LOAD MORE ========== */
+.load-more-wrapper {
+  text-align: center;
+  margin: 30px 0;
+}
+
+#load-more {
+  background: var(--maroon);
+  color: var(--white);
+  border: none;
+  padding: 12px 28px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+#load-more:hover {
+  background: rgba(128,0,0,0.8);
+}
+
+/* ========== FOOTER ========== */
+.site-footer {
+  background: var(--black);
+  color: #bbb;
+  padding: 30px 20px;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.9rem;
+}
+
+.site-footer a {
+  color: #bbb;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.site-footer a:hover {
+  color: var(--white);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .rankings-header h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+  nav.rankings-nav {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+  }
+}
+
+
+
+/* === RANKINGS PAGE ONLY STYLES === */
+:root {
+  --maroon: #800000;
+  --black: #000;
+  --white: #fff;
+  --gray-light: #ccc;
+  --font: 'Roboto', sans-serif;
+}
+
+body.rankings-body {
+  background: linear-gradient(to bottom, var(--maroon), var(--black));
+  color: var(--white);
+  font-family: var(--font);
+  min-height: 100vh;
+}
+
+/* Page Title */
+.page-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 40px;
+}
+
+/* Event Sections */
+.rankings-event-section {
+  margin-bottom: 60px;
+  padding: 0 20px;
+}
+
+/* Gender Tabs */
+.rankings-gender-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.gender-tab {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  padding: 10px 20px;
+  border: 1px solid var(--white);
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.gender-tab.active,
+.gender-tab:hover {
+  background-color: var(--white);
+  color: var(--black);
+}
+
+/* Rankings Table */
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  display: none;
+}
+
+.rankings-table.active {
+  display: table;
+}
+
+.rankings-table thead {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.rankings-table th,
+.rankings-table td {
+  padding: 12px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: left;
+}
+
+.rankings-table a {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+.rankings-table a:hover {
+  color: #ddd;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 2.2rem;
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .gender-tab {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+}
+

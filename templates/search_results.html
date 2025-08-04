@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Results</title>
+  <link rel="stylesheet" href="/static/css/search_results.css" />
+  <link rel="icon" type="image/png" href="/static/images/favicon.png" />
+  <script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- NAV BAR -->
+  <nav>
+    <a href="/">
+      <img class="logo" src="/static/images/AthletIQ (1).png" alt="AthletIQ Logo" />
+    </a>
+    <div class="nav-right">
+      <div class="profile-button-container">
+        <a href="/dashboard">
+          <div class="profile-button">
+            <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+          </div>
+        </a>
+      </div>
+      <div class="menu-button-container">
+        <div class="menu-button" onclick="toggleMenu()">
+          <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
+        </div>
+        <div class="menu-content" id="menuContent">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/rankings">Rankings</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/login">Log in</a></li>
+            <li><a href="/logout">Log out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE CONTENT -->
+  <div class="background-wrapper">
+    <div class="landing-container">
+      <div class="main-content">
+        <h1 class="slogan">Search Results for "{{ query }}"</h1>
+        <div class="results-container">
+          {% if results %}
+            <ul>
+              {% for result in results %}
+                <li>{{ result[0] }} {{ result[1] }} – 
+                  <a href="/profile/{{ result[2] }}">View Profile</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No results found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("menuContent").classList.toggle("active");
+    }
+  </script>
+  <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+                <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                </div>
+            </div>
+    </footer>
+</body>
+</html>

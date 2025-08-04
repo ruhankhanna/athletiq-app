@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Your Email</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333333;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin: auto;
+      padding: 30px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #ff0000;
+      color: rgb(0, 0, 0);
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #888;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Hey {{ first_name }},</h2>
+
+    <p>Welcome to <strong>athletIQ</strong>! I'm excited to have you on board.</p>
+
+    <p>To get started, please confirm your email address by clicking the button below:</p>
+
+    <a href="{{ confirm_url }}"
+      style="background-color:#d9534f; color:white; padding:12px 20px; text-decoration:none; display:inline-block; border-radius:5px; font-weight:bold;">
+      Confirm Email
+    </a>
+
+
+    <p>If the button doesn’t work, you can copy and paste this link into your browser:</p>
+    <p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+
+    <p style="margin-top: 30px;">
+      Thanks again,<br>
+      <strong>Ruhan</strong><br>
+      Founder, athletIQ
+    </p>
+
+    <div class="footer">
+      <p>This link will expire in 24 hours.</p>
+      <p>If you didn’t sign up, just ignore this message.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <link rel="icon" type="image/png" href="/static/images/favicon.png" />
+  <script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="background-wrapper">
+    <div class="landing-container">
+      <!-- NAV BAR -->
+        <nav>
+        <a href="/">
+            <img class="logo" src="/static/images/AthletIQ (1).png" alt="AthletIQ Logo" />
+        </a>
+       <div class="nav-right">
+         <div class="messages-button-container">
+          <a href="/messages">
+            <div class="messages-button" style="position: relative;">
+              <i class="fa-solid fa-envelope" style="color: #ffffff;"></i>
+              {% if unread_count and unread_count > 0 %}
+                <span class="notification-badge">{{ unread_count }}</span>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+
+          <div class="profile-button-container">
+            <a href="/dashboard">
+              <div class="profile-button">
+                <i class="fa-solid fa-user" style="color: #ffffff;"></i>
+              </div>
+            </a>
+          </div>
+
+          <div class="settings-button-container">
+            <div class="settings-button" onclick="openSettingsModal()">
+              <i class="fa-solid fa-gear" style="color: #ffffff;" alt="settings-button"></i>
+            </div>
+          </div>
+
+
+          <div class="menu-button-container">
+          <div class="menu-button" onclick="toggleMenu()">
+              <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
+          </div>
+          <div class="menu-content">
+              <ul>
+                  <li><a href="/">Home</a></li>
+                  <li><a href="/rankings">Rankings</a></li>
+                  <li><a href="/about">About</a></li>
+                  <li><a href="/login">Log in</a></li>
+                  <li><a href="/logout"><i class="fa-solid fa-sign-out-alt" style="color: #ffffff;"></i> Log out</a></li>
+              </ul>
+          </div>
+        </div>
+        
+
+
+        </nav>
+
+
+      <!-- DASHBOARD HEADER -->
+      <header class="dashboard-header">
+        <div class="welcome-section">
+          <h1>Welcome, {{ first_name }}</h1>
+          <p class="sub">Here's your current performance overview</p>
+        </div>
+        <div class="rating-badge">
+          <span class="label">{{ best_event }} Rating</span>
+          <span class="value">{{ event_ratings.get(best_event, "UR") }}</span>
+
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <section class="content-container">
+        <div class="profile-card">
+          <h3>{{ first_name }} {{ last_name }}</h3>
+          <p>Age: {{ age }}</p>
+
+          {% if school and school != "N/A" %}
+            <p>School: {{ school }}
+              {% if grad_year and grad_year != "N/A" %}
+                (Class of {{ grad_year }})
+              {% endif %}
+            </p>
+          {% endif %}
+
+          {% if club and club != "N/A" %}
+            <p>Club: {{ club }}</p>
+          {% endif %}
+
+          {% if city or state %}
+            <p>Location:
+              {% if city and state %}
+                {{ city }}, {{ state }}
+              {% elif city %}
+                {{ city }}
+              {% elif state %}
+                {{ state }}
+              {% endif %}
+            </p>
+          {% endif %}
+
+        </div>
+
+
+
+
+        <div class="event-grid">
+        {% set display_events = ["100M", "200M", "400M", "800M", "1 Mile", "2 Mile", "5K"] %}
+        {% for event in display_events %}
+          <div class="event-tile">
+              <h4>
+                {{ event }}
+                {% if event == "1 Mile" or event == "2 Mile" %}
+                  <i class="fa-solid fa-circle-info info-icon"
+                    data-event="{{ event }}"
+                    onclick="showInfo(this)">
+                  </i>
+
+                {% endif %}
+              </h4>
+              <p class="event-rating">
+                {% set rating = event_ratings.get(event) %}
+                {{ rating if rating else "UR" }}
+              </p>
+          </div>
+        {% endfor %}
+
+        </div>
+      </section>
+
+      <!-- RECENT RESULTS -->
+      <section class="recent-results">
+        <div class="recent-results-title">Recent Results</div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <select id="year-filter">
+            <option value="">All Years</option>
+            {% for y in years %}
+              <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+          </select>
+
+          <select id="event-filter">
+            <option value="">All Events</option>
+            {% for event in filterable_events %}
+              <option value="{{ event }}">{{ event }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Results List -->
+        <div id="results-container">
+          {% for result in results %}
+            <div class="recent-results-item {% if loop.index > 4 %}hidden-result{% endif %}"
+                data-event="{{ result[0] }}"
+                data-year="{{ result[2] }}">
+                
+              <div class="recent-results-header">
+                <span class="recent-results-title">{{ result[0] }}</span>
+                <span class="recent-results-date">{{ result[2] }}</span>
+              </div>
+
+              <div class="recent-results-time">{{ result[1] }}</div>
+
+              {% if result[3] %}
+                <div class="recent-results-meet">Meet: {{ result[3] }}</div>
+              {% endif %}
+              
+              {% if result[4] %}
+                <div class="recent-results-place">Place: {{ result[4] }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+        </div>
+
+        <!-- Load More -->
+        {% if results|length > 4 %}
+          <div style="text-align: center; margin-top: 20px;">
+            <button id="load-more-button">Load More</button>
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- SETTINGS MODAL -->
+      <div class="modal" id="settings-modal">
+        <div class="modal_contents">
+          <span class="close-modal" onclick="closeSettingsModal()">
+            <i class="fa fa-times"></i>
+          </span>
+
+          <h2>Account Settings</h2>
+          <form action="/update_profile" method="POST">
+            <div class="input-group">
+              <label for="school">School</label>
+              <input name="school" id="school" type="text" value="{{ school if school not in ['N/A', None] else '' }}">
+            </div>
+
+            <div class="input-group">
+              <label for="club_team">Club Team</label>
+              <input name="club_team" id="club_team" type="text" value="{{ club or '' }}">
+            </div>
+
+            <div class="input-group">
+              <label for="city">City</label>
+              <input name="city" id="city" type="text" value="{{ city or '' }}">
+            </div>
+
+            <div class="input-group">
+              <label for="state">State (e.g. TX)</label>
+              <input name="state" id="state" type="text" value="{{ state or '' }}" maxlength="2">
+            </div>
+            <div class="input-group">
+              <label for="grad_year">Graduation Year</label>
+              <input name="grad_year" id="grad_year" type="text" value="{{ grad_year or '' }}">
+            </div>
+            <button type="submit">Save Changes</button>
+          </form>
+
+          <hr style="margin: 1rem 0;" />
+          <form action="/delete_account" method="POST" onsubmit="return confirm('Are you sure? This cannot be undone.')">
+            <button type="submit" class="danger-button">Delete Account</button>
+          </form>
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+
+  <script src="/static/js/dashboard.js"></script>
+  <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+                <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+                </div>
+                <div class="footer-right">
+                <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                </div>
+            </div>
+    </footer>
+
+
+    <div class="info-popup" id="infoPopup">
+      <div class="info-popup-content">
+        <span class="close-info-popup" onclick="closeInfo()">&times;</span>
+        <p id="infoText"></p>
+      </div>
+    </div>
+
+</body>
+</html>

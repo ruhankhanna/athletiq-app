@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rankings | AthletIQ</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/rankings.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Reusing existing nav bar layout from homepage -->
+  <nav>
+    <a href="/"><img class="logo" src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo"></a>
+    <div class="menu-button-container">
+      <div class="menu-button">
+        <i class="fa-solid fa-bars" style="color: #ffffff;" alt="menu-button"></i>
+      </div>
+      <div class="menu-content">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/rankings">Rankings</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/login">Log in</a></li>
+          <li><a href="/logout"><i class="fa-solid fa-sign-out-alt" style="color: #ffffff;"></i> Log out</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="profile-button-container">
+      <a href="/dashboard">
+        <div class="profile-button">
+          <i class="fa-solid fa-user" alt="profile-button" style="color: #ffffff;"></i>
+        </div>
+      </a>
+    </div>
+  </nav>
+
+  <main class="content-container" style="margin-top: 120px; padding: 0 20px;">
+    <h1 class="page-title" style="text-align:center; font-size: 3rem; margin-bottom: 40px;">World Rankings</h1>
+
+    {% for event in display_events %}
+      <section class="rankings-event-section" style="margin-bottom: 60px;">
+        <h2 style="font-size: 2rem; margin-bottom: 10px;">{{ event }}</h2>
+        <div class="rankings-gender-tabs" style="margin-bottom: 10px;">
+          {% for gender in genders %}
+            <button class="gender-tab" data-event="{{ event }}" data-gender="{{ gender }}">
+              {{ gender }}
+            </button>
+          {% endfor %}
+        </div>
+
+        {% for gender in genders %}
+          <table class="rankings-table" data-event="{{ event }}" data-gender="{{ gender }}">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Rating</th>
+                <th>Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for runner in rankings[event][gender] %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ runner.first_name }} {{ runner.last_name }}</td>
+                  <td>{{ runner.rating|truncate_rating }}</td>
+
+                  <td><a href="{{ url_for('profile', slug=runner.slug) }}">View</a></td>
+                </tr>
+              {% endfor %}
+              {% if rankings[event][gender]|length == 0 %}
+                <tr><td colspan="4">No {{ gender }} results yet.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        {% endfor %}
+      </section>
+    {% endfor %}
+  </main>
+
+  <!-- Use the same footer from homepage -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+        <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+      </div>
+      <div class="footer-right">
+        <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/rankings.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>

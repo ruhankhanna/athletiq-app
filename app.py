@@ -406,11 +406,27 @@ def login():
     
     return render_template("login.html")
 
-def calculate_age(birthday):
-    today = datetime.today()
-    birthdate = datetime.strptime(birthday, '%Y-%m-%d')
+def calculate_age(birthday: str) -> int:
+    """
+    birthday: 'YYYY-MM-DD'
+    Returns a non-negative integer age. Future birthdays clamp to 0.
+    """
+    today = datetime.today().date()
+    try:
+        birthdate = datetime.strptime(birthday, '%Y-%m-%d').date()
+    except ValueError:
+        # Bad format -> treat as 0 (or raise; up to you)
+        return 0
+
+    # If the date is in the future, clamp to 0
+    if birthdate > today:
+        return 0
+
     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-    return age
+    return max(0, age)
+
+
+from requests.exceptions import RequestException  # put this at the top of the file
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -434,13 +450,11 @@ def register():
 
         cur = mysql.connection.cursor()
 
+        # block duplicate profile claims
         cur.execute("SELECT 1 FROM user WHERE profile_link = %s", (profile_link,))
         if cur.fetchone():
             cur.close()
-            flash("That athletic.net profile is already claimed.", "warning")
             return render_template("register.html", error="Profile link already in use.")
-
-
 
         try:
             # 2) Insert user into DB
@@ -477,14 +491,18 @@ def register():
                     expected_last=last_name
                 )
                 print(f"[REGISTER] Profile name matches for {first_name} {last_name}")
+            except RequestException as net_err:
+                # NEW: handle network/timeouts separately (do NOT delete user)
+                print(f"[REGISTER][NETWORK] couldn’t reach {profile_link}: {net_err}")
+                cur.close()
+                return render_template("register.html", error="Network error while verifying profile.")
             except Exception as name_err:
-                # On mismatch, delete the just-inserted user
+                # Real mismatches still delete the new row
+                print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
                 cur.execute("DELETE FROM user WHERE email = %s", (email,))
                 mysql.connection.commit()
-                flash("Your profile name didn’t match what you entered. Please double-check.", "danger")
                 cur.close()
-                return render_template("register.html",
-                                       error="Profile name mismatch. Account not created.")
+                return render_template("register.html", error="Profile name mismatch. Account not created.")
 
             # 4) If name matched, insert all scraped results
             y_values = []
@@ -509,11 +527,9 @@ def register():
                       (email, event_name, event_time, event_date,
                        meet_name, rating, finishing_place)
                     VALUES
-                      (%s,      %s,         %s,         %s,
-                       %s,        %s,      %s)
+                      (%s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (email, normalized, cleaned, date_fmt,
-                     meet, rating, place)
+                    (email, normalized, cleaned, date_fmt, meet, rating, place)
                 )
                 y_values.append(rating)
 
@@ -523,37 +539,30 @@ def register():
                 cur.execute("UPDATE user SET rating = %s WHERE email = %s", (avg, email))
 
             mysql.connection.commit()
-            print(f"[REGISTER] Inserted {len(y_values)} results and avg={avg:.2f} for {email}")
+            print(f"[REGISTER] Inserted {len(y_values)} results"
+                  + (f" and avg={avg:.2f}" if y_values else "") + f" for {email}")
 
         except MySQLdb.IntegrityError:
             # Duplicate email
-            flash("That email is already registered.", "warning")
             cur.close()
             return render_template("register.html", error="Email already taken.")
-
         finally:
-            cur.close()
+            # Close the cursor for the write phase
+            try:
+                cur.close()
+            except Exception:
+                pass
 
+        # === Email confirmation phase (open a fresh cursor) ===
+        cur = mysql.connection.cursor()
 
-                # after mysql.connection.commit() in register():
-
-        # 5) Compute and store average rating
-        if y_values:
-            avg = sum(y_values) / len(y_values)
-            cur = mysql.connection.cursor() 
-            cur.execute("UPDATE user SET rating = %s WHERE email = %s", (avg, email))
-
-        mysql.connection.commit()
-        print(f"[REGISTER] Inserted {len(y_values)} results and avg={avg:.2f} for {email}")
-
-        # ✅ [START] PREVENT SPAMMY RESEND
+        # prevent spammy resend
         cur.execute("SELECT confirm_sent_at FROM user WHERE email = %s", (email,))
         row = cur.fetchone()
         if row and row[0] and datetime.utcnow() - row[0] < timedelta(minutes=10):
             flash("Confirmation email was sent recently. Please wait before resending.", "info")
             cur.close()
             return redirect(url_for('unconfirmed'))
-        # ✅ [END]
 
         token = serializer.dumps(email, salt='email-confirm-salt')
         confirm_url = url_for('confirm_email', token=token, _external=True)
@@ -563,30 +572,21 @@ def register():
             subject="Welcome to athletIQ – Please confirm your email",
             recipients=[email],
             html=html_body,
-            sender="Ruhan from athletIQ <your@email.com>"  # ← Optional override
+            sender="Ruhan from athletIQ <your@email.com>"
         )
-
         mail.send(msg)
 
-        # record send time
-        cur = mysql.connection.cursor()
-        cur.execute(
-            "UPDATE user SET confirm_sent_at = NOW() WHERE email = %s", (email,)
-        )
+        cur.execute("UPDATE user SET confirm_sent_at = NOW() WHERE email = %s", (email,))
         mysql.connection.commit()
         cur.close()
+
         session["email"] = email
         session.permanent = True
-
         return redirect(url_for('unconfirmed'))
-    
-
-        # 6) Everything succeeded: log them in
-        
-        return redirect(url_for("dashboard"))
 
     # GET => just render form
     return render_template("register.html")
+
 
 
 

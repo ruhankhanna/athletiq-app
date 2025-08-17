@@ -8,24 +8,33 @@ import time
 from webdriver_manager.chrome import ChromeDriverManager
 from decouple import config
 
+def get_driver():
+    options = Options()
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+
 # Credentials for athletic.net
 EMAIL = config("SCRAPER_EMAIL")
 PASSWORD = config("SCRAPER_PASSWORD")
 
 # Set up Selenium Chrome Driver
-options = Options()
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver = None
 
 logged_in = False
 
 def login_athletic_net():
-    global logged_in
+    global logged_in, driver
 
     if logged_in:
         return
+    
 
+    driver = get_driver()
     driver.get("https://www.athletic.net/account/login")
     time.sleep(3)
+
 
     email_input = driver.find_element(By.XPATH, "//input[@placeholder='Enter Email']")
     email_input.clear()
@@ -113,7 +122,11 @@ def scrape_filtered_results(profile_url, expected_first, expected_last):
 
 
 def close_driver():
-    driver.quit()
+    global driver
+    if driver:
+        driver.quit()
+        driver = None
+
 
 
 

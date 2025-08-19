@@ -7,11 +7,20 @@ from bs4 import BeautifulSoup
 import time
 from webdriver_manager.chrome import ChromeDriverManager
 from decouple import config
+import tempfile
+import shutil
+
+_temp_dir = None  # global so you can clean it up
 
 def get_driver():
+    global _temp_dir
+    _temp_dir = tempfile.mkdtemp()
+
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument(f"--user-data-dir={_temp_dir}")  # <-- this line is critical
+
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 
@@ -122,10 +131,14 @@ def scrape_filtered_results(profile_url, expected_first, expected_last):
 
 
 def close_driver():
-    global driver
+    global driver, _temp_dir
     if driver:
         driver.quit()
         driver = None
+    if _temp_dir:
+        shutil.rmtree(_temp_dir, ignore_errors=True)
+        _temp_dir = None
+
 
 
 
@@ -136,3 +149,4 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+

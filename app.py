@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from authlib.integrations.flask_client import OAuth
-from decouple import config
 from flask_migrate import Migrate
 from sqlalchemy.exc import SQLAlchemyError
 from flask_mysqldb import MySQL
@@ -32,7 +31,9 @@ from itsdangerous import URLSafeTimedSerializer
 from email_validator import validate_email, EmailNotValidError
 
 
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 
 def generate_slug(first_name, last_name):
@@ -244,7 +245,8 @@ def import_ghost_profiles(start_id: int, end_id: int, batch: int = 100):
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=2)  # or hours=1, minutes=30, etc.
 
-app.secret_key = config('SECRET_KEY')
+app.secret_key = os.getenv('SECRET_KEY')
+
 
 app.config.update(
     MAIL_SERVER   = os.getenv('MAIL_SERVER'),
@@ -288,11 +290,6 @@ def make_session_permanent_and_check_timeout():
         session['last_active'] = now.strftime("%Y-%m-%d %H:%M:%S")
 
 
-
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
 
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')

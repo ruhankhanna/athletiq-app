@@ -247,13 +247,14 @@ app.permanent_session_lifetime = timedelta(days=2)  # or hours=1, minutes=30, et
 app.secret_key = config('SECRET_KEY')
 
 app.config.update(
-    MAIL_SERVER   = config('MAIL_SERVER'),
-    MAIL_PORT     = config('MAIL_PORT', cast=int),
+    MAIL_SERVER   = os.getenv('MAIL_SERVER'),
+    MAIL_PORT     = int(os.getenv('MAIL_PORT')),
     MAIL_USE_TLS  = True,
-    MAIL_USERNAME = config('MAIL_USERNAME'),
-    MAIL_PASSWORD = config('MAIL_PASSWORD'),
-    MAIL_DEFAULT_SENDER = config('MAIL_DEFAULT_SENDER')
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'),
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
 )
+
 mail = Mail(app)
 
 # Serializer for generating tokens
@@ -288,10 +289,16 @@ def make_session_permanent_and_check_timeout():
 
 
 
-app.config['MYSQL_HOST'] = config('MYSQL_HOST')
-app.config['MYSQL_USER'] = config('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = config('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = config('MYSQL_DB')
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+app.secret_key = os.getenv('SECRET_KEY')
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
 mysql = MySQL(app)
 
@@ -1207,4 +1214,5 @@ atexit.register(close_driver)
 
 
 if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+    app.run(port=8000, debug=False)
+

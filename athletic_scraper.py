@@ -16,12 +16,15 @@ def get_driver():
     global _temp_dir
     _temp_dir = tempfile.mkdtemp()
 
+    print(f"[SCRAPER DEBUG] Using temp profile directory: {_temp_dir}")
+
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument(f"--user-data-dir={_temp_dir}")  # <-- this line is critical
+    options.add_argument(f"--user-data-dir={_temp_dir}")
 
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 
 
 # Credentials for athletic.net
@@ -149,4 +152,5 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 

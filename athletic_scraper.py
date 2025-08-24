@@ -59,7 +59,15 @@ def login_athletic_net():
     password_input.send_keys(PASSWORD)
 
     login_button = driver.find_element(By.XPATH, "//button[contains(text(), 'Log In')]")
-    login_button.click()
+    # Try clicking login button
+    try:
+        driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
+        time.sleep(1)
+        login_button.click()
+    except Exception:
+        print("[SCRAPER WARNING] Login button click intercepted, retrying with JS")
+        driver.execute_script("arguments[0].click();", login_button)
+
 
     time.sleep(3)
 
@@ -154,6 +162,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

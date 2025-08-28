@@ -23,7 +23,6 @@ def get_driver():
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--headless=new")
     options.add_argument("--remote-debugging-port=0")
     options.add_argument(f"--user-data-dir={_temp_dir}")
 
@@ -164,6 +163,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

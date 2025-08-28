@@ -3,11 +3,8 @@ body {
   padding: 0;
 }
 
-nav {
-  position: fixed;
-}
-
-
+nav{
+position: fixed;
 }
 .background-wrapper {
   min-height: 100vh;  /* ensures full screen */
@@ -126,7 +123,7 @@ nav {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 9999; /* raised to ensure visibility */
+  z-index: 999;
   width: 25px;
 }
 
@@ -145,21 +142,21 @@ nav {
 }
 
 .menu-content {
-  position: fixed;
-  top: 70px;
-  right: 20px;
+  position: absolute;
+  top: 100%;
+  right: 0;
   width: 200px;
   background-color: rgba(0, 0, 0, 0.95);
   padding: 12px 16px;
   border-radius: 8px;
-  z-index: 9999; /* boosted from 1001 */
+  z-index: 1001;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-
 .menu-content.active {
+  right: 0;
   opacity: 1;
   pointer-events: auto;
 }
@@ -476,4 +473,3 @@ font-family: "Roboto", sans-serif;
 
 
   
-

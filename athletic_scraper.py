@@ -13,6 +13,8 @@ import shutil
 _temp_dir = None  # global so you can clean it up
 
 def get_driver():
+    print("[SCRAPER DEBUG] Launching Chrome driver")
+
     global _temp_dir
     _temp_dir = tempfile.mkdtemp()
 
@@ -162,6 +164,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

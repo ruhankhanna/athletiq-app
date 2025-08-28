@@ -95,143 +95,133 @@ def normalize_event_name(event_name):
     return mapping.get(event_name, event_name.replace(" Meters", "M").upper())
 
 def rescrape_all_users():
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT email, profile_link FROM user WHERE profile_link IS NOT NULL")
-    users = cur.fetchall()
+    with app.app_context():
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email, profile_link FROM user WHERE profile_link IS NOT NULL")
+        users = cur.fetchall()
 
-    for email, link in users:
-        try:
-            scraped_results = scrape_filtered_results(link)
+        for email, link in users:
+            try:
+                scraped_results = scrape_filtered_results(link)
 
-            # Delete previous results
-            cur.execute("DELETE FROM results WHERE email = %s", (email,))
+                # Delete previous results
+                cur.execute("DELETE FROM results WHERE email = %s", (email,))
 
-            y_values = []
-            for event, time_str, date, meet, place in scraped_results:
-                normalized_event = normalize_event_name(event)
+                y_values = []
+                for event, time_str, date, meet, place in scraped_results:
+                    normalized_event = normalize_event_name(event)
 
-                try:
-                    time_in_sec = convert_time_to_seconds(time_str)
-                    if time_in_sec is None:
+                    try:
+                        time_in_sec = convert_time_to_seconds(time_str)
+                        if time_in_sec is None:
+                            continue
+
+                        rating = get_event_rating(normalized_event, time_in_sec)
+                        if rating is None:
+                            continue
+
+                        date_obj = datetime.strptime(date, "%b %d, %Y")
+                        formatted_date = date_obj.strftime("%Y-%m-%d")
+
+                        cleaned_time_str = re.sub(r'[a-zA-Z]', '', time_str).strip()
+
+                        cur.execute(
+                            """
+                            INSERT INTO results
+                            (email, event_name, event_time, event_date, meet_name, rating, finishing_place)
+                            VALUES
+                            (%s, %s, %s, %s, %s, %s, %s)
+                            """,
+                            (email, normalized_event, cleaned_time_str, formatted_date, meet, rating, place)
+                        )
+                        y_values.append(rating)
+                    except Exception as inner_e:
+                        print(f"[ERROR] Failed to process result: {event}, error: {inner_e}")
                         continue
 
-                    rating = get_event_rating(normalized_event, time_in_sec)
-                    if rating is None:
-                        continue
+                # Update average rating in user table
+                if y_values:
+                    avg_rating = sum(y_values) / len(y_values)
+                    cur.execute("UPDATE user SET rating = %s WHERE email = %s", (avg_rating, email))
 
-                    date_obj = datetime.strptime(date, "%b %d, %Y")
-                    formatted_date = date_obj.strftime("%Y-%m-%d")
+                mysql.connection.commit()
+            except Exception as e:
+                print(f"[FAILED to scrape {email}]: {e}")
 
-                    cleaned_time_str = re.sub(r'[a-zA-Z]', '', time_str).strip()
+        cur.close()
 
-                    cur.execute(
-                        """
-                        INSERT INTO results
-                        (email, event_name, event_time, event_date, meet_name, rating, finishing_place)
-                        VALUES
-                        (%s,      %s,         %s,         %s,         %s,        %s,      %s)
-                        """,
-                        (email, normalized_event, cleaned_time_str, formatted_date, meet, rating, place)
-                    )
-
-
-                    y_values.append(rating)
-                except Exception as inner_e:
-                    print(f"[ERROR] Failed to process result: {event}, error: {inner_e}")
-                    continue
-
-            # Update average rating in user table
-            if y_values:
-                avg_rating = sum(y_values) / len(y_values)
-                cur.execute("UPDATE user SET rating = %s WHERE email = %s", (avg_rating, email))
-
-            mysql.connection.commit()
-        except Exception as e:
-            print(f"[FAILED to scrape {email}]: {e}")
-
-    cur.close()
 
 
 # -------------------------------------------------------------------
 # GHOST PROFILE IMPORTER
 # -------------------------------------------------------------------
 def import_ghost_profiles(start_id: int, end_id: int, batch: int = 100):
-    """
-    Walk Athletic.net IDs from start_id to end_id in chunks of `batch`,
-    scrape each profile's name, and insert as a ghost user if not already present.
-    """
-    cur = mysql.connection.cursor()
-    for athlete_id in range(start_id, end_id + 1):
-        profile_url = f"https://www.athletic.net/TrackAndField/Athlete.aspx?AID={athlete_id}"
-        try:
-            # only need name; reuse our scraper but skip result table
-            driver.get(profile_url)
-            time.sleep(2)
-            soup = BeautifulSoup(driver.page_source, "html.parser")
-            name_tag = soup.select_one("a.me-2.text-sport")
-            if not name_tag:
-                continue
-            full_name = name_tag.get_text(strip=True)
-            first, *last = full_name.split()
-            last = " ".join(last) or ""
-            slug = generate_slug(first, last)
-            # ensure slug unique
-            cur.execute("SELECT 1 FROM user WHERE slug=%s", (slug,))
-            if cur.fetchone():
-                continue
-
-            # insert ghost
-            # insert ghost
-            cur.execute("""
-                INSERT INTO user
-                (email, password, first_name, last_name, gender, birthday, age,
-                city, state, school, club, grad_year, profile_link, slug, is_ghost)
-                VALUES
-                (%s,       %s,       %s,          %s,        %s,     %s,       %s,
-                %s,      %s,     %s,      %s,     %s,     %s,           %s,       TRUE)
-                """, (
-                None,      None,     first,       last,     None,    None,      None,
-                None,     None,    None,     None,    None,    profile_url, slug
-                )
-            )
-
-            # ⬇️ NEW BLOCK: Scrape & insert results
+    with app.app_context():
+        cur = mysql.connection.cursor()
+        for athlete_id in range(start_id, end_id + 1):
+            profile_url = f"https://www.athletic.net/TrackAndField/Athlete.aspx?AID={athlete_id}"
             try:
-                scraped_results = scrape_filtered_results(profile_url)
-                y_values = []
+                driver.get(profile_url)
+                time.sleep(2)
+                soup = BeautifulSoup(driver.page_source, "html.parser")
+                name_tag = soup.select_one("a.me-2.text-sport")
+                if not name_tag:
+                    continue
+                full_name = name_tag.get_text(strip=True)
+                first, *last = full_name.split()
+                last = " ".join(last) or ""
+                slug = generate_slug(first, last)
+                cur.execute("SELECT 1 FROM user WHERE slug=%s", (slug,))
+                if cur.fetchone():
+                    continue
 
-                for event, time_str, date, meet, place in scraped_results:
-                    normalized = normalize_event_name(event)
-                    secs = convert_time_to_seconds(time_str)
-                    if secs is None:
-                        continue
-                    rating = get_event_rating(normalized, secs)
-                    if rating is None:
-                        continue
-                    formatted_date = datetime.strptime(date, "%b %d, %Y").strftime("%Y-%m-%d")
-                    cleaned = re.sub(r"[a-zA-Z]", "", time_str).strip()
-                    cur.execute("""
-                        INSERT INTO results (email, event_name, event_time, event_date, meet_name, rating, finishing_place)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
-                    """, (None, normalized, cleaned, formatted_date, meet, rating, place))
-                    y_values.append(rating)
+                cur.execute("""
+                    INSERT INTO user
+                    (email, password, first_name, last_name, gender, birthday, age,
+                    city, state, school, club, grad_year, profile_link, slug, is_ghost)
+                    VALUES
+                    (%s, %s, %s, %s, %s, %s, %s,
+                     %s, %s, %s, %s, %s, %s, %s, TRUE)
+                """, (
+                    None, None, first, last, None, None, None,
+                    None, None, None, None, None, profile_url, slug
+                ))
 
-                # Optional: store average rating
-                if y_values:
-                    avg = sum(y_values) / len(y_values)
-                    cur.execute("UPDATE user SET rating = %s WHERE slug = %s", (avg, slug))
+                try:
+                    scraped_results = scrape_filtered_results(profile_url)
+                    y_values = []
 
-            except Exception as e:
-                print(f"[GHOST SCRAPE ERROR] Failed to scrape results for ghost {slug}: {e}")
+                    for event, time_str, date, meet, place in scraped_results:
+                        normalized = normalize_event_name(event)
+                        secs = convert_time_to_seconds(time_str)
+                        if secs is None:
+                            continue
+                        rating = get_event_rating(normalized, secs)
+                        if rating is None:
+                            continue
+                        formatted_date = datetime.strptime(date, "%b %d, %Y").strftime("%Y-%m-%d")
+                        cleaned = re.sub(r"[a-zA-Z]", "", time_str).strip()
+                        cur.execute("""
+                            INSERT INTO results (email, event_name, event_time, event_date, meet_name, rating, finishing_place)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        """, (None, normalized, cleaned, formatted_date, meet, rating, place))
+                        y_values.append(rating)
 
-                # commit every batch
-            if athlete_id % batch == 0:
-                mysql.connection.commit()
-                print(f"[GHOST IMPORT] up to ID {athlete_id}")
-        except Exception:
-            continue
-    mysql.connection.commit()
-    cur.close()
+                    if y_values:
+                        avg = sum(y_values) / len(y_values)
+                        cur.execute("UPDATE user SET rating = %s WHERE slug = %s", (avg, slug))
+
+                except Exception as e:
+                    print(f"[GHOST SCRAPE ERROR] Failed to scrape results for ghost {slug}: {e}")
+
+                if athlete_id % batch == 0:
+                    mysql.connection.commit()
+                    print(f"[GHOST IMPORT] up to ID {athlete_id}")
+            except Exception:
+                continue
+        mysql.connection.commit()
+        cur.close()
+
 # -------------------------------------------------------------------
 
 
@@ -598,15 +588,17 @@ def register():
 
 
 def update_ages():
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT email, birthday FROM user")
-    users = cur.fetchall()
-    for user in users:
-        email, birthday = user
-        age = calculate_age(birthday)
-        cur.execute("UPDATE user SET age = %s WHERE email = %s", (age, email))
-    mysql.connection.commit()
-    cur.close()
+    with app.app_context():
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email, birthday FROM user")
+        users = cur.fetchall()
+        for user in users:
+            email, birthday = user
+            age = calculate_age(birthday)
+            cur.execute("UPDATE user SET age = %s WHERE email = %s", (age, email))
+        mysql.connection.commit()
+        cur.close()
+
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=rescrape_all_users, trigger="interval", hours=24)

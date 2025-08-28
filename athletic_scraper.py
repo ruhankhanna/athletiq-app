@@ -21,11 +21,29 @@ def get_driver():
     print(f"[SCRAPER DEBUG] Using temp profile directory: {_temp_dir}")
 
     options = Options()
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--headless=chrome")
-    options.add_argument("--remote-debugging-port=0")
+    options.add_argument("--headless=chrome")         # keep headless
+    options.add_argument("--no-sandbox")              # required in many VM envs
+    options.add_argument("--disable-dev-shm-usage")   # avoid /dev/shm issues
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-software-rasterizer")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-sync")
+    options.add_argument("--no-first-run")
+    options.add_argument("--no-default-browser-check")
+    options.add_argument("--metrics-recording-only")
+    options.add_argument("--mute-audio")
+    options.add_argument("--hide-scrollbars")
+    options.add_argument("--window-size=1280,800")
+    
+    # Use a fixed, non-zero debugging port
+    options.add_argument("--remote-debugging-port=9222")
+    
+    # Make sure Chrome has its own writable dirs
     options.add_argument(f"--user-data-dir={_temp_dir}")
+    options.add_argument(f"--data-path={_temp_dir}/data-path")
+    options.add_argument(f"--disk-cache-dir={_temp_dir}/cache-dir")
+
 
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -184,6 +202,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

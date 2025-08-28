@@ -491,12 +491,15 @@ def register():
                 cur.close()
                 return render_template("register.html", error="Network error while verifying profile.")
             except Exception as name_err:
-                # Real mismatches still delete the new row
+                import traceback
+                traceback.print_exc()  # <-- This logs the full error trace
+            
                 print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
                 cur.execute("DELETE FROM user WHERE email = %s", (email,))
                 mysql.connection.commit()
                 cur.close()
                 return render_template("register.html", error="Profile name mismatch. Account not created.")
+
 
             # 4) If name matched, insert all scraped results
             y_values = []

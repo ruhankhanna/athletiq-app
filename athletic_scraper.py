@@ -96,21 +96,33 @@ def scrape_filtered_results(profile_url, expected_first, expected_last):
     
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
-
-    # 3) Grab the athlete’s name anchor
+    # Step 1: Save screenshot for inspection
+   # Step 1: Save screenshot for inspection
+    driver.save_screenshot("/tmp/profile_debug.png")
+    
+    # Step 2: Dump page source to check if JS loaded
+    with open("/tmp/profile_debug.html", "w", encoding="utf-8") as f:
+        f.write(driver.page_source)
+    
+    # Step 3: Attempt to select name element
     name_anchor = soup.select_one("a.me-2.text-sport")
-    if not name_anchor:
-        raise Exception("Could not find athlete name on profile page")
-    scraped_name = name_anchor.get_text(strip=True).lower()
+    if name_anchor:
+        scraped_name = name_anchor.get_text(strip=True).lower()
+    else:
+        scraped_name = "<NOT FOUND>"
+    
     form_name = f"{expected_first} {expected_last}".strip().lower()
-
-    print(f"[DEBUG] Scraped: '{scraped_name}' vs Form: '{form_name}'")
-
-    # 4) Validate
+    
+    # Step 4: Print DEBUG info
+    print(f"[DEBUG] Scraped Name = '{scraped_name}'")
+    print(f"[DEBUG] Form Name    = '{form_name}'")
+    
+    # Step 5: Strict comparison
     if form_name not in scraped_name:
         raise Exception(
-            f"Name mismatch: profile shows “{scraped_name}” but form submitted “{form_name}”"
+            f"[MISMATCH] Athlete name mismatch:\nForm: '{form_name}'\nScraped: '{scraped_name}'"
         )
+
 
 
     results = []
@@ -172,6 +184,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

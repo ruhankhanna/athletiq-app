@@ -23,6 +23,7 @@ def get_driver():
     options = Options()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--headless=chrome")
     options.add_argument("--remote-debugging-port=0")
     options.add_argument(f"--user-data-dir={_temp_dir}")
 
@@ -86,9 +87,15 @@ def scrape_filtered_results(profile_url, expected_first, expected_last):
     login_athletic_net()
 
     driver.get(profile_url)
-    time.sleep(5)
-
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "a.me-2.text-sport"))
+    )
+    
     soup = BeautifulSoup(driver.page_source, "html.parser")
+
 
     # 3) Grab the athlete’s name anchor
     name_anchor = soup.select_one("a.me-2.text-sport")
@@ -96,6 +103,8 @@ def scrape_filtered_results(profile_url, expected_first, expected_last):
         raise Exception("Could not find athlete name on profile page")
     scraped_name = name_anchor.get_text(strip=True).lower()
     form_name = f"{expected_first} {expected_last}".strip().lower()
+
+    print(f"[DEBUG] Scraped: '{scraped_name}' vs Form: '{form_name}'")
 
     # 4) Validate
     if form_name not in scraped_name:
@@ -163,6 +172,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

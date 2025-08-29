@@ -39,7 +39,9 @@ def get_driver():
     options.add_argument("--window-size=1280,800")
     
     # Use a fixed, non-zero debugging port
-    options.add_argument("--remote-debugging-port=9222")
+    # use an ephemeral port to avoid conflicts across workers
+    options.add_argument("--remote-debugging-port=0")
+
     
     # Make sure Chrome has its own writable dirs
     options.add_argument(f"--user-data-dir={_temp_dir}")
@@ -218,6 +220,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

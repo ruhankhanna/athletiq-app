@@ -29,6 +29,7 @@ from athletic_scraper import (
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from email_validator import validate_email, EmailNotValidError
+from selenium.common.exceptions import WebDriverException
 
 
 from dotenv import load_dotenv
@@ -478,6 +479,7 @@ def register():
             print(f"[REGISTER] Created user row for {email}")
 
             # 3) Immediately verify the athletic.net profile name
+            # 3) Immediately verify the athletic.net profile name
             try:
                 scraped_results = scrape_filtered_results(
                     profile_link,
@@ -485,14 +487,29 @@ def register():
                     expected_last=last_name
                 )
                 print(f"[REGISTER] Profile name matches for {first_name} {last_name}")
+            
             except RequestException as net_err:
-                # NEW: handle network/timeouts separately (do NOT delete user)
+                # Network/timeouts (do NOT delete user)
                 print(f"[REGISTER][NETWORK] couldn’t reach {profile_link}: {net_err}")
                 cur.close()
-                return render_template("register.html", error="Network error while verifying profile.")
+                return render_template("register.html", error="Network error while verifying profile. Please try again.")
+            
+            except WebDriverException as wd_err:
+                # Selenium/Chrome failed to start or crashed (do NOT delete user)
+                print(f"[REGISTER][SCRAPER] Chrome/WebDriver failed: {wd_err}")
+                cur.close()
+                return render_template("register.html", error="Server scraper failed to launch Chrome. Please try again.")
+            
             except Exception as name_err:
+                # Only treat this as a real name mismatch AFTER scraper is running
                 import traceback
-                traceback.print_exc()  # <-- This logs the full error trace
+                traceback.print_exc()
+                print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
+                cur.execute("DELETE FROM user WHERE email = %s", (email,))
+                mysql.connection.commit()
+                cur.close()
+                return render_template("register.html", error="Profile name mismatch. Account not created.")
+
             
                 print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
                 cur.execute("DELETE FROM user WHERE email = %s", (email,))

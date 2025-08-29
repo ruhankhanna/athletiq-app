@@ -9,6 +9,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from decouple import config
 import tempfile
 import shutil
+import sys
+import traceback
 
 _temp_dir = None  # global so you can clean it up
 
@@ -216,6 +218,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

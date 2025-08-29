@@ -44,8 +44,22 @@ def get_driver():
     options.add_argument(f"--data-path={_temp_dir}/data-path")
     options.add_argument(f"--disk-cache-dir={_temp_dir}/cache-dir")
 
+    options.add_argument("--enable-logging=stderr")
+    options.add_argument("--v=1")
 
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    options.binary_location = "/usr/bin/google-chrome"
+
+    
+
+
+
+    try:
+        return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    except Exception as e:
+        print("[SCRAPER FATAL] Could not start Chrome:", e, file=sys.stderr)
+        traceback.print_exc()
+        raise
 
 
 
@@ -202,6 +216,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

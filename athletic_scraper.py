@@ -11,6 +11,7 @@ import tempfile
 import shutil
 import sys
 import traceback
+import os
 
 _temp_dir = None  # global so you can clean it up
 
@@ -207,6 +208,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

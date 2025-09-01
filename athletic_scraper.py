@@ -15,12 +15,20 @@ import traceback
 _temp_dir = None  # global so you can clean it up
 
 def get_driver():
+    print("[SCRAPER DEBUG] Launching Chrome driver")
+
     global _temp_dir
     _temp_dir = tempfile.mkdtemp(prefix="chrome-profile-")
+    print(f"[SCRAPER DEBUG] Using temp profile directory: {_temp_dir}")
+
+    # 🛠️ Fix crash: explicitly set runtime dirs
+    os.environ["XDG_RUNTIME_DIR"] = "/tmp/athletiq-runtime"
+    os.environ["TMPDIR"] = "/tmp"
+    os.environ["CHROME_LOG_FILE"] = "/tmp/chrome_debug.log"  # optional debug
 
     options = Options()
-    options.add_argument("--headless=new")  # Use modern headless
-    options.add_argument("--no-sandbox")  # Required in most VM/container setups
+    options.add_argument("--headless=new")  # ✅ use modern headless
+    options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-software-rasterizer")
@@ -33,14 +41,14 @@ def get_driver():
     options.add_argument("--mute-audio")
     options.add_argument("--hide-scrollbars")
     options.add_argument("--window-size=1280,800")
-    options.add_argument("--remote-debugging-pipe")  # Instead of problematic TCP port
+    options.add_argument("--remote-debugging-pipe")  # ✅ crucial fix
 
-    # Use a clean, writable Chrome profile directory
+    # Temporary user profile
     options.add_argument(f"--user-data-dir={_temp_dir}")
     options.add_argument(f"--data-path={_temp_dir}/data-path")
     options.add_argument(f"--disk-cache-dir={_temp_dir}/cache-dir")
 
-    # Explicit Chrome binary location
+    # Chrome binary path
     options.binary_location = "/usr/bin/google-chrome"
 
     return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
@@ -199,6 +207,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

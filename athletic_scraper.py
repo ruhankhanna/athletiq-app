@@ -15,17 +15,13 @@ import traceback
 _temp_dir = None  # global so you can clean it up
 
 def get_driver():
-    print("[SCRAPER DEBUG] Launching Chrome driver")
-
     global _temp_dir
-    _temp_dir = tempfile.mkdtemp()
-
-    print(f"[SCRAPER DEBUG] Using temp profile directory: {_temp_dir}")
+    _temp_dir = tempfile.mkdtemp(prefix="chrome-profile-")
 
     options = Options()
-    options.add_argument("--headless=chrome")         # keep headless
-    options.add_argument("--no-sandbox")              # required in many VM envs
-    options.add_argument("--disable-dev-shm-usage")   # avoid /dev/shm issues
+    options.add_argument("--headless=new")  # Use modern headless
+    options.add_argument("--no-sandbox")  # Required in most VM/container setups
+    options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-software-rasterizer")
     options.add_argument("--disable-extensions")
@@ -37,34 +33,17 @@ def get_driver():
     options.add_argument("--mute-audio")
     options.add_argument("--hide-scrollbars")
     options.add_argument("--window-size=1280,800")
-    
-    # Use a fixed, non-zero debugging port
-    # use an ephemeral port to avoid conflicts across workers
-    options.add_argument("--remote-debugging-port=0")
+    options.add_argument("--remote-debugging-pipe")  # Instead of problematic TCP port
 
-    
-    # Make sure Chrome has its own writable dirs
+    # Use a clean, writable Chrome profile directory
     options.add_argument(f"--user-data-dir={_temp_dir}")
     options.add_argument(f"--data-path={_temp_dir}/data-path")
     options.add_argument(f"--disk-cache-dir={_temp_dir}/cache-dir")
 
-    options.add_argument("--enable-logging=stderr")
-    options.add_argument("--v=1")
-
-
+    # Explicit Chrome binary location
     options.binary_location = "/usr/bin/google-chrome"
 
-    
-
-
-
-    try:
-        return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    except Exception as e:
-        print("[SCRAPER FATAL] Could not start Chrome:", e, file=sys.stderr)
-        traceback.print_exc()
-        raise
-
+    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 
 # Credentials for athletic.net
@@ -220,6 +199,7 @@ __all__ = [
     "scrape_filtered_results",
     "close_driver",
 ]
+
 
 
 

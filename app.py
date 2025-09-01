@@ -452,7 +452,7 @@ def register():
             return render_template("register.html", error="Profile link already in use.")
 
         try:
-            # 2) Insert user into DB
+    # 2) Insert user into DB
             slug = generate_unique_slug(first_name, last_name, cur)
             cur.execute(
                 """
@@ -477,95 +477,29 @@ def register():
             )
             mysql.connection.commit()
             print(f"[REGISTER] Created user row for {email}")
-
-            # 3) Immediately verify the athletic.net profile name
-            # 3) Immediately verify the athletic.net profile name
-            try:
-                scraped_results = scrape_filtered_results(
-                    profile_link,
-                    expected_first=first_name,
-                    expected_last=last_name
-                )
-                print(f"[REGISTER] Profile name matches for {first_name} {last_name}")
-            
-            except RequestException as net_err:
-                # Network/timeouts (do NOT delete user)
-                print(f"[REGISTER][NETWORK] couldn’t reach {profile_link}: {net_err}")
-                cur.close()
-                return render_template("register.html", error="Network error while verifying profile. Please try again.")
-            
-            except WebDriverException as wd_err:
-                # Selenium/Chrome failed to start or crashed (do NOT delete user)
-                print(f"[REGISTER][SCRAPER] Chrome/WebDriver failed: {wd_err}")
-                cur.close()
-                return render_template("register.html", error="Server scraper failed to launch Chrome. Please try again.")
-            
-            except Exception as name_err:
-                # Only treat this as a real name mismatch AFTER scraper is running
-                import traceback
-                traceback.print_exc()
-                print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
-                cur.execute("DELETE FROM user WHERE email = %s", (email,))
-                mysql.connection.commit()
-                cur.close()
-                return render_template("register.html", error="Profile name mismatch. Account not created.")
-
-            
-                print(f"[REGISTER][NAME MISMATCH] expected=({first_name} {last_name}) link={profile_link} err={name_err}")
-                cur.execute("DELETE FROM user WHERE email = %s", (email,))
-                mysql.connection.commit()
-                cur.close()
-                return render_template("register.html", error="Profile name mismatch. Account not created.")
-
-
-            # 4) If name matched, insert all scraped results
-            y_values = []
-            for event, time_str, date_str, meet, place in scraped_results:
-                normalized = normalize_event_name(event)
-                secs = convert_time_to_seconds(time_str)
-                if secs is None:
-                    continue
-                rating = get_event_rating(normalized, secs)
-                if rating is None:
-                    continue
-                try:
-                    dt = datetime.strptime(date_str, "%b %d, %Y")
-                    date_fmt = dt.strftime("%Y-%m-%d")
-                except ValueError:
-                    continue
-                cleaned = re.sub(r"[a-zA-Z]", "", time_str).strip()
-
-                cur.execute(
-                    """
-                    INSERT INTO results
-                      (email, event_name, event_time, event_date,
-                       meet_name, rating, finishing_place)
-                    VALUES
-                      (%s, %s, %s, %s, %s, %s, %s)
-                    """,
-                    (email, normalized, cleaned, date_fmt, meet, rating, place)
-                )
-                y_values.append(rating)
-
-            # 5) Compute and store average rating
-            if y_values:
-                avg = sum(y_values) / len(y_values)
-                cur.execute("UPDATE user SET rating = %s WHERE email = %s", (avg, email))
-
-            mysql.connection.commit()
-            print(f"[REGISTER] Inserted {len(y_values)} results"
-                  + (f" and avg={avg:.2f}" if y_values else "") + f" for {email}")
-
+        
+            # 3) Offload scraping via subprocess
+            import subprocess
+            print(f"[REGISTER] Offloading scrape for {email}")
+            subprocess.Popen([
+                "python3",
+                "/home/athletiqadmin/athletiq-app/scraper_runner.py",
+                email,
+                first_name,
+                last_name,
+                profile_link
+            ])
+        
         except MySQLdb.IntegrityError:
             # Duplicate email
             cur.close()
             return render_template("register.html", error="Email already taken.")
         finally:
-            # Close the cursor for the write phase
             try:
                 cur.close()
             except Exception:
                 pass
+
 
         # === Email confirmation phase (open a fresh cursor) ===
         cur = mysql.connection.cursor()

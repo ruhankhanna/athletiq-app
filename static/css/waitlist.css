@@ -128,7 +128,7 @@ nav {
   max-width: 920px;
   margin: 0 auto;
   padding: 16px;
-  padding-top: 100px; /* account for fixed nav */
+  padding-top: 60px; /* account for fixed nav */
 }
 
 /* Hero */

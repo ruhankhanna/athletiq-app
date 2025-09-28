@@ -1,74 +1,166 @@
-:root {
-  --ink: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --bg: #f8fafc;
-  --accent: #111827;
-}
+/* waitlist.css — dark/glass theme consistent with About/Home */
 
+/* Base */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+
 body {
-  font-family: "Roboto", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  color: var(--ink);
-  background: var(--bg);
+  background: linear-gradient(to bottom, #800000, #000000);
+  font-family: "Roboto", sans-serif;
+  color: #ffffff;
+  min-height: 100vh;
 }
 
-/* Layout */
-.wrap { max-width: 920px; margin: 0 auto; padding: 16px; }
+/* Reuse site-wide wrappers */
+.background-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #800000, #000000);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
-/* Header */
-.site-header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
+.landing-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.site-header .wrap {
-  display: flex; align-items: center; justify-content: space-between;
+
+/* Nav (matching dark layout) */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  z-index: 999;
 }
-.logo { height: 34px; }
-.nav a {
-  color: var(--ink); text-decoration: none; margin-left: 16px; font-weight: 500;
+
+.logo {
+  position: fixed;
+  top: -95px;
+  left: -20px;
+  width: 240px;
+  height: auto;
 }
-.nav a:hover { text-decoration: underline; }
+
+/* Menu button & dropdown (reuse class names from site) */
+.menu-button-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 25px;
+}
+.menu-button { cursor: pointer; width: 20px; height: 20px; border-radius: 50%; position: relative; }
+.menu-content {
+  position: absolute; top: 100%; right: 0; width: 200px;
+  background-color: rgba(0, 0, 0, 0.95);
+  padding: 12px 16px; border-radius: 8px; z-index: 1001;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.menu-content.active { opacity: 1; pointer-events: auto; }
+.menu-content ul { list-style: none; padding: 0; margin: 0; }
+.menu-content li { margin-bottom: 10px; }
+.menu-content a { text-decoration: none; color: #ffffff; font-size: 16px; }
+
+/* Page content container */
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-top: 100px; /* account for fixed nav */
+}
 
 /* Hero */
-.hero { text-align: left; margin: 24px 0 8px; }
-.hero h1 { font-size: 32px; margin: 0 0 6px; }
-.lead { color: var(--muted); }
+.hero { margin: 36px 0 8px; text-align: left; }
+.hero h1 { font-size: 36px; margin: 0 0 8px; }
+.lead { color: #e6e6e6; line-height: 1.6; }
 
-/* Cards & form */
+/* Glass card (matches vision-glass vibe) */
 .card {
-  background: #fff; border: 1px solid var(--border);
-  border-radius: 16px; padding: 16px; margin-top: 16px;
-}
-.card.success h2 { margin-top: 0; }
-.form label { display: block; font-size: 14px; color: var(--ink); margin-bottom: 10px; }
-.form input, .form textarea {
-  width: 100%; margin-top: 6px; padding: 10px 12px;
-  border: 1px solid var(--border); border-radius: 10px;
-  font-size: 14px; background: #fff;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  padding: 20px;
+  margin-top: 16px;
+  color: #fff;
 }
 
-/* Buttons */
+/* Success card state */
+.card.success h2 { margin-top: 0; }
+
+/* Form */
+.form label { display: block; font-size: 14px; margin-bottom: 12px; }
+.form input, .form textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.20);
+  border-radius: 12px;
+  outline: none;
+}
+.form input::placeholder, .form textarea::placeholder { color: rgba(255,255,255,0.65); }
+.form input:focus, .form textarea:focus {
+  border-color: rgba(255,255,255,0.35);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+}
+
+/* Buttons (match your white pill style) */
 .btn {
-  display: inline-block; padding: 10px 14px; border-radius: 999px; text-decoration: none;
-  border: 1px solid var(--border); color: var(--ink); background: #fff;
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #000;
+  background: rgba(255,255,255,0.88);
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .2s ease, background-color .2s ease;
 }
-.btn.primary {
-  background: var(--accent); color: #fff; border: 0;
+.btn.primary { border: 0; }
+.btn:hover {
+  background-color: #eaeaea;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255,255,255,0.18);
 }
-.btn:hover { opacity: 0.95; }
 
 /* Alerts */
 .alert {
-  border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: 14px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 16px;
+  font-size: 14px;
 }
-.alert-error { background: #fee2e2; color: #7f1d1d; }
+.alert-error {
+  background: rgba(255, 87, 87, 0.15);
+  color: #ffd1d1;
+  border: 1px solid rgba(255, 87, 87, 0.35);
+}
 .alert-error ul { margin: 0; padding-left: 18px; }
 
-/* Footer */
-.site-footer { border-top: 1px solid var(--border); background: #fff; margin-top: 32px; }
-.footer-content { display: flex; align-items: center; justify-content: space-between; }
+/* Footer (dark) */
+.site-footer {
+  background-color: #000;
+  color: #fff;
+  padding: 40px 30px;
+  font-size: 14px;
+  border-top: 1px solid #222;
+  margin-top: 32px;
+}
+.footer-content { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
 .footer-logo-img { height: 28px; display: block; margin-bottom: 6px; }
-.footer-content .right a { margin-left: 12px; color: var(--muted); }
-.footer-content .right a:hover { color: var(--ink); }
+.footer-content .right a { margin-left: 12px; color: #bbb; transition: color .2s ease; font-size: 18px; }
+.footer-content .right a:hover { color: #fff; }
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 28px; }
+  .lead { font-size: 15px; }
+  .btn { padding: 10px 16px; font-size: 14px; }
+}

@@ -14,10 +14,22 @@
   <header class="site-header">
     <div class="wrap">
       <img class="logo" src="static/images/AthletIQ (1).png" alt="AthletIQ Logo">
-      <nav class="nav">
-        <a href="/">Home</a>
-        <a href="/about">About</a>
+      <nav>
+        <img class="logo" src="static/images/AthletIQ (1).png" alt="AthletIQ Logo">
+        <div class="menu-button-container">
+          <div class="menu-button">
+            <i class="fa-solid fa-bars" style="color: #ffffff;" alt="menu-button"></i>
+          </div>
+          <div class="menu-content">
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+            </ul>
+          </div>
+        </div>
+        <!-- Public site: no dashboard/login links -->
       </nav>
+
     </div>
   </header>
 
@@ -78,17 +90,24 @@
   </main>
 
   <footer class="site-footer">
-    <div class="wrap footer-content">
-      <div class="left">
+    <div class="footer-container">
+      <div class="footer-left">
         <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
         <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
       </div>
-      <div class="right">
-        <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-        <a href="mailto:ruhan@athletiq.run" aria-label="Email"><i class="fas fa-envelope"></i></a>
+      <div class="footer-right">
+        <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+          <i class="fas fa-envelope"></i>
+        </a>
       </div>
     </div>
   </footer>
+
 </body>
 </html>

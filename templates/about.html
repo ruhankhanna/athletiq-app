@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About athletIQ</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <title>About Us</title>
     <link rel="stylesheet" href="static/css/about.css">
     <link rel="icon" type="image/png" href="static/images/favicon.png" />
     <script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
@@ -13,7 +14,7 @@
     <div class="background-wrapper">
         <div class="landing-container">
             <nav>
-                <img class="logo" src="static/images/AthletIQ (1).png" alt="NetrIQ Logo">
+                <img class="logo" src="static/images/AthletIQ (1).png" alt="AthletIQ Logo">
                 <div class="menu-button-container">
                     <div class="menu-button">
                         <i class="fa-solid fa-bars" style="color: #ffffff;" alt="menu-button"></i>
@@ -21,94 +22,72 @@
                     <div class="menu-content">
                         <ul>
                             <li><a href="/">Home</a></li>
-                            <li><a href="/rankings">Rankings</a></li>
                             <li><a href="/about">About</a></li>
-                            <li><a href="/login">Log in</a></li>
-                            <li><a href="/logout"><i class="fa-solid fa-sign-out-alt" style="color: #ffffff;"></i> Log out</a></li>
                         </ul>
                     </div>
                 </div>
-                <div class="profile-button-container">
-                    <a href="/dashboard">
-                        <div class="profile-button">
-                        <i class="fa-solid fa-user" alt="profile-button" style="color: #ffffff;"></i>
-                        </div>
-                    </a>
-                </div>
-
+                <!-- Public site: no dashboard/login links -->
             </nav>
+
             <div class="main-content">
-                <h1 class="slogan">Where runners unite.</h1>
-                <p class="description">Built off the experience of real runners, athletIQ Ratings are universal,  <br> no matter your age, gender, or ability. <br> <br> <br> Every time a runner sets is rated using a fine-tuned logarithmic <br> function, for each event. A final rating is determined<br> by calculating a weighted average of a runner's times in the last year, per event. <br> <br> <br> We want to spread the joy of running to everyone; create an account to get started now! </p>
-                <div class="register-button-container">
-                    {% if 'email' in session %}
-                        <a href="/dashboard" class="register-button">
-                            GO TO DASHBOARD
-                        </a>
-                    {% else %}
-                        <a href="/register" class="register-button">
-                            JOIN THE COMMUNITY
-                        </a>
-                    {% endif %}
-                </div>
-
-                
+                <h1 class="slogan">About athletIQ</h1>
+                <p class="description">
+                    athletIQ started as a community ratings project and has evolved into a platform focused on helping
+                    <strong>college track &amp; cross-country programs recruit smarter</strong>.
+                    We combine verified results from Athletic.net with statistical modeling to give coaches a clearer,
+                    fairer view of athlete performance.
+                    <br><br>
+                    Instead of simple PR lists, we highlight what matters for recruiting:
+                    <em>recency-weighted performance, short-term trajectory, realistic 3/6/12-month forecasts, and
+                    meet-day bias adjustments</em> that make comparisons more fair across courses and conditions.
+                </p>
             </div>
-
-
 
             <section class="vision-section">
                 <div class="vision-glass reveal">
-                    <h2>Our Vision for the Future</h2>
+                    <h2>Our Mission</h2>
                     <p>
-                    At athletIQ, we imagine a world where every runner — from beginners to professionals — is part of a unified, intelligent running ecosystem.
-                    <br><br>
-                    We aim to become the go-to platform for athletes to:
+                        Build a reliable, data-driven foundation for collegiate running so every program can identify
+                        talent more effectively — and every athlete can be evaluated more fairly.
                     </p>
+
+                    <h2 style="margin-top:24px;">What We’re Building</h2>
                     <ul>
-                    <li>Compete in <strong>ability-based</strong> races — not just age-grouped</li>
-                    <li><strong>Host</strong> and manage meets from anywhere</li>
-                    <li><strong>Find clubs</strong> and run groups instantly</li>
-                    <li><strong>Track trends</strong> and scout athletes with powerful analytics</li>
+                        <li><strong>Performance projections</strong> at 3, 6, and 12 months</li>
+                        <li><strong>Recency-weighted analytics</strong> that reflect current shape</li>
+                        <li><strong>Meet/course normalization</strong> for fair comparisons</li>
+                        <li><strong>Nationwide scouting views</strong> tailored for coaching staffs</li>
                     </ul>
+
                     <p>
-                    With the support of Microsoft and AWS, and inspired by models like UTR, we're building the future of running powered by data.
-                    </p>
-                    <p>
-                    Stay tuned for more updates, including athletIQ Premium — our upcoming subscription service that will offer advanced AI-driven analytics and early access to new features.
+                        Powered by modern cloud infrastructure and inspired by the best rating systems in sport,
+                        athletIQ is purpose-built for the needs of college coaches.
                     </p>
                 </div>
             </section>
-
-
-
-
-
         </div>
 
+        <script defer src="/static/js/about.js"></script>
 
-       <script defer src="/static/js/about.js"></script>
-
-       <footer class="site-footer">
+        <footer class="site-footer">
             <div class="footer-container">
                 <div class="footer-left">
-                <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
-                <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+                    <img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+                    <p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
                 </div>
                 <div class="footer-right">
-                <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a href="mailto:ruhan@athletiq.run" aria-label="Email">
-                    <i class="fas fa-envelope"></i>
-                </a>
+                    <a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="mailto:ruhan@athletiq.run" aria-label="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
                 </div>
             </div>
         </footer>
-
+    </div>
 </body>
-
 </html>

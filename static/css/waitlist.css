@@ -35,6 +35,66 @@ nav {
   z-index: 999;
 }
 
+
+/* Make the nav/menu identical */
+nav {
+  position: fixed;
+}
+.menu-button-container { 
+  position: fixed; top: 20px; right: 20px; z-index: 999; width: 25px;
+}
+.menu-button { cursor: pointer; width: 20px; height: 20px; border-radius: 50%; position: relative; }
+.menu-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.95);
+  padding: 12px 16px;
+  border-radius: 8px;
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.menu-content.active { opacity: 1; pointer-events: auto; }
+.menu-content ul { list-style: none; padding: 0; margin: 0; }
+.menu-content li { margin-bottom: 10px; }
+.menu-content a { text-decoration: none; color: #fff; font-size: 16px; }
+
+/* Footer (reuse about.css) */
+.site-footer {
+  background-color: #000;
+  color: #fff;
+  padding: 40px 30px;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  border-top: 1px solid #222;
+  margin-top: 0;
+}
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .footer-container {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+.footer-left img {
+  width: 140px;   /* make logo bigger */
+  height: auto;
+  margin-bottom: 10px;
+}
+.footer-right a { color: #bbb; transition: color 0.3s ease; font-size: 20px; }
+.footer-right a:hover { color: #fff; }
+
+
 .logo {
   position: fixed;
   top: -95px;

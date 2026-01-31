@@ -100,8 +100,7 @@ def waitlist():
                 errors=["Something went wrong saving your entry. Please try again."],
                 form=request.form,
                 success=False
-            )
-                @app.route("/contact", methods=["GET", "POST"])
+
         return render_template("waitlist.html", success=True)
 
     # GET

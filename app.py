@@ -95,8 +95,6 @@ def waitlist():
         except Exception as e:
             # Log to server console; show generic error to user
             print(f"[WAITLIST ERROR] {e}")
-
-            )
         return render_template("waitlist.html", success=True)
 
     # GET
@@ -114,7 +112,7 @@ def favicon():
         os.path.join(app.static_folder, "images"),
         "favicon.png",
         mimetype="image/png"
-                            return render_template("contact.html", errors=errors, form=request.form, success=False)
+
 
 # Redirect old/removed routes to home
 @app.route("/rankings")

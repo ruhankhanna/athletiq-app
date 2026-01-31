@@ -95,12 +95,8 @@ def waitlist():
         except Exception as e:
             # Log to server console; show generic error to user
             print(f"[WAITLIST ERROR] {e}")
-            return render_template(
-                "waitlist.html",
-                errors=["Something went wrong saving your entry. Please try again."],
-                form=request.form,
-                success=False
 
+            )
         return render_template("waitlist.html", success=True)
 
     # GET

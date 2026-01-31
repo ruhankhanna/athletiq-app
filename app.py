@@ -112,7 +112,7 @@ def favicon():
         os.path.join(app.static_folder, "images"),
         "favicon.png",
         mimetype="image/png"
-
+    )
 
 # Redirect old/removed routes to home
 @app.route("/rankings")

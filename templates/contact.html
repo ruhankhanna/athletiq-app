@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>Contact – athletIQ</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+	<link rel="icon" type="image/png" href="static/images/favicon.png" />
+	<link rel="stylesheet" href="static/css/waitlist.css" />
+	<script src="https://kit.fontawesome.com/8a3f3507f1.js" crossorigin="anonymous"></script>
+	<script defer src="/static/js/landing.js"></script>
+</head>
+<body>
+	<header class="site-header">
+		<div class="wrap">
+			<img class="logo" src="static/images/AthletIQ (1).png" alt="AthletIQ Logo">
+			<nav>
+				<img class="logo" src="static/images/AthletIQ (1).png" alt="AthletIQ Logo">
+				<div class="menu-button-container">
+					<div class="menu-button">
+						<i class="fa-solid fa-bars" style="color: #ffffff;" alt="menu-button"></i>
+					</div>
+					<div class="menu-content">
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/about">About</a></li>
+						</ul>
+					</div>
+				</div>
+				<!-- Public site: no dashboard/login links -->
+			</nav>
+		</div>
+	</header>
+	<main class="wrap">
+		<section class="hero">
+			<h1>Contact</h1>
+			<p class="lead">
+				College track &amp; XC coaches: be the first to access athletIQ’s analytics and recruiting tools.
+			</p>
+		</section>
+		{% if errors %}
+			<div class="alert alert-error">
+				<ul>
+					{% for e in errors %}
+						<li>{{ e }}</li>
+					{% endfor %}
+				</ul>
+			</div>
+		{% endif %}
+		{% if success %}
+			<div class="card success">
+				<h2>You're on the list ✅</h2>
+				<p>Thanks! We'll reach out when your program can get early access.</p>
+				<a href="/" class="btn">Back to Home</a>
+			</div>
+		{% else %}
+			<form method="post" class="card form">
+				<label>
+					Coach name
+					<input type="text" name="coach_name" placeholder="e.g., Jordan Smith" value="{{ form.coach_name if form else '' }}" required />
+				</label>
+				<label>
+					Email
+					<input type="email" name="email" placeholder="coach@university.edu" value="{{ form.email if form else '' }}" required />
+				</label>
+				<label>
+					School / Program
+					<input type="text" name="school" placeholder="e.g., West State University – XC/TF" value="{{ form.school if form else '' }}" required />
+				</label>
+				<label>
+					Role (optional)
+					<input type="text" name="role" placeholder="e.g., Head Coach / Assistant / Recruiting Coordinator" value="{{ form.role if form else '' }}" />
+				</label>
+				<label>
+					Notes (optional)
+					<textarea name="notes" rows="4" placeholder="Anything you'd like us to know (events of interest, recruiting timelines, etc.)">{{ form.notes if form else '' }}</textarea>
+				</label>
+				<button type="submit" class="btn primary">GET STARTED</button>
+			</form>
+		{% endif %}
+	</main>
+	<footer class="site-footer">
+		<div class="footer-container">
+			<div class="footer-left">
+				<img src="{{ url_for('static', filename='images/AthletIQ (1).png') }}" alt="AthletIQ Logo" class="footer-logo-img">
+				<p>&copy; {{ current_year }} AthletIQ LLC. All rights reserved.</p>
+			</div>
+			<div class="footer-right" style="display: flex; gap: 18px; align-items: center;">
+				<a href="https://www.instagram.com/athletiq.run/" target="_blank" aria-label="Instagram">
+					<i class="fab fa-instagram"></i>
+				</a>
+				<a href="https://www.linkedin.com/company/athletiq-rating/?viewAsMember=true" target="_blank" aria-label="LinkedIn">
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a href="mailto:ruhan@athletiq.run" aria-label="Email">
+					<i class="fas fa-envelope"></i>
+				</a>
+			</div>
+		</div>
+	</footer>
+</body>
+</html>

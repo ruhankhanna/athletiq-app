@@ -1,4 +1,4 @@
-# app.py (public site + waitlist → Google Sheets)
+# app.py (public site + contact → Google Sheets)
 from flask import Flask, render_template, send_from_directory, redirect, request
 from datetime import datetime
 import os
@@ -31,7 +31,7 @@ def _gs_client():
 
 def _append_waitlist_row(coach_name: str, email: str, school: str, role: str | None, notes: str | None):
     """
-    Append a new row to the first sheet of the spreadsheet indicated by WAITLIST_SHEET_ID.
+    Append a new row to the first sheet of the spreadsheet indicated by CONTACT_SHEET_ID.
     """
     sheet_id = os.getenv("WAITLIST_SHEET_ID")
     if not sheet_id:
@@ -101,7 +101,7 @@ def waitlist():
                 form=request.form,
                 success=False
             )
-
+                @app.route("/contact", methods=["GET", "POST"])
         return render_template("waitlist.html", success=True)
 
     # GET
@@ -119,16 +119,16 @@ def favicon():
         os.path.join(app.static_folder, "images"),
         "favicon.png",
         mimetype="image/png"
-    )
+                            return render_template("contact.html", errors=errors, form=request.form, success=False)
 
 # Redirect old/removed routes to home
 @app.route("/rankings")
-@app.route("/login")
+                            _append_contact_row(coach_name, email, school, role, notes)
 @app.route("/register")
 @app.route("/dashboard")
 def retired_routes():
     return redirect("/")
-
+                                "contact.html",
 # -----------------------------
 # Entrypoint
 # -----------------------------

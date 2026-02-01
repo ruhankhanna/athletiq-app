@@ -68,9 +68,9 @@ def home():
 def about():
     return render_template("about.html")
 
-# --- Waitlist (writes to Google Sheets) ---
-@app.route("/waitlist", methods=["GET", "POST"])
-def waitlist():
+# --- Contact (writes to Google Sheets) ---
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
     if request.method == "POST":
         coach_name = (request.form.get("coach_name") or "").strip()
         email      = (request.form.get("email") or "").strip()
@@ -87,18 +87,17 @@ def waitlist():
         if not school:
             errors.append("Please enter your school/program.")
         if errors:
-            return render_template("waitlist.html", errors=errors, form=request.form, success=False)
+            return render_template("contact.html", errors=errors, form=request.form, success=False)
 
         # append to Google Sheet
         try:
             _append_waitlist_row(coach_name, email, school, role, notes)
         except Exception as e:
-            # Log to server console; show generic error to user
             print(f"[WAITLIST ERROR] {e}")
-        return render_template("waitlist.html", success=True)
+        return render_template("contact.html", success=True)
 
     # GET
-    return render_template("waitlist.html", success=False)
+    return render_template("contact.html", success=False)
 
 # Health endpoint
 @app.route("/health")

@@ -115,12 +115,10 @@ def favicon():
 
 # Redirect old/removed routes to home
 @app.route("/rankings")
-                            _append_contact_row(coach_name, email, school, role, notes)
 @app.route("/register")
 @app.route("/dashboard")
 def retired_routes():
     return redirect("/")
-                                "contact.html",
 # -----------------------------
 # Entrypoint
 # -----------------------------
